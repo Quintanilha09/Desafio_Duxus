@@ -2,14 +2,13 @@ package br.com.duxusdesafio.service;
 
 import br.com.duxusdesafio.exceptions.DataNotFoundException;
 import br.com.duxusdesafio.exceptions.NotFoundException;
-import br.com.duxusdesafio.exceptions.TimeNullPointerException;
+import br.com.duxusdesafio.exceptions.NullTimeException;
 import br.com.duxusdesafio.model.ComposicaoTime;
 import br.com.duxusdesafio.model.Integrante;
 import br.com.duxusdesafio.model.Time;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,15 +52,15 @@ public class ApiService {
 
     /**
      * Filtra os times de acordo com o período especificado.
-     * Este método foi criado para simplificar o método 'integranteMaisUsado'
+     * Este método foi criado para simplificar todos os métodos que necessitam de filtragem por período
      * Seguindo o primeiro princípio do SOLID, Single Responsability Principle
      */
     private List<Time> filtrarTimesPorPeriodo(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes) {
         if (todosOsTimes == null || todosOsTimes.isEmpty()) {
-            throw new TimeNullPointerException("A lista de todos os times não pode ser nula ou vazia.");
+            throw new NullTimeException("A lista de todos os times não pode ser nula ou vazia.");
         }
 
-        return todosOsTimes.stream()
+        List<Time> timesFiltrados = todosOsTimes.stream()
                 .filter(time -> {
                     LocalDate dataTime = time.getData();
                     boolean depoisDaInicial = (dataInicial == null || !dataTime.isBefore(dataInicial));
@@ -69,6 +68,10 @@ public class ApiService {
                     return depoisDaInicial && antesDaFinal;
                 })
                 .collect(Collectors.toList());
+        if (timesFiltrados.isEmpty()) {
+            throw new NotFoundException("Nenhum time encontrado no período especificado.");
+        }
+        return timesFiltrados;
     }
 
     /**
@@ -78,15 +81,21 @@ public class ApiService {
      */
     private Map<Integrante, Long> contarAparicoes(List<Time> timesFiltrados) {
         if (timesFiltrados == null || timesFiltrados.isEmpty()) {
-            throw new TimeNullPointerException("A lista de times filtrados não pode ser nula ou vazia.");
+            throw new NullTimeException("A lista de times filtrados não pode ser nula ou vazia.");
         }
 
-        return timesFiltrados.stream()
-                .flatMap(time -> time.getComposicaoTime().stream())  // Achatar para ter uma lista de ComposicaoTime
+        Map<Integrante, Long> contadorDeAparicoes = timesFiltrados.stream()
+                .flatMap(time -> time.getComposicaoTime().stream())
                 .collect(Collectors.groupingBy(
                         ComposicaoTime::getIntegrante,
                         Collectors.counting()
                 ));
+
+        if (contadorDeAparicoes.isEmpty()) {
+            throw new NotFoundException("Nenhum integrante encontrado na contagem de aparições.");
+        }
+
+        return contadorDeAparicoes;
     }
 
     /**
@@ -110,24 +119,58 @@ public class ApiService {
      * dentro do período
      */
     public List<String> timeMaisComum(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes){
-        // TODO Implementar método seguindo as instruções!
-        return null;
+        List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+
+        if (timesFiltrados.isEmpty()) {
+            throw new NotFoundException("Nenhum time encontrado no período especificado.");
+        }
+
+        Time timeMaisComum = timesFiltrados.stream()
+                .collect(Collectors.groupingBy(time -> time, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElseThrow(() -> new NotFoundException("Nenhum time mais comum encontrado."));
+
+        return timeMaisComum.getComposicaoTime().stream()
+                .map(composicao -> composicao.getIntegrante().getNome())
+                .collect(Collectors.toList());
     }
 
     /**
      * Vai retornar a função mais comum nos times dentro do período
      */
     public String funcaoMaisComum(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes){
-        // TODO Implementar método seguindo as instruções!
-        return null;
+        List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+
+        return timesFiltrados.stream()
+                .flatMap(time -> time.getComposicaoTime().stream())  // Obtém a composição de cada time
+                .map(composicao -> composicao.getIntegrante().getFuncao())  // Mapeia para a função do integrante
+                .collect(Collectors.groupingBy(funcao -> funcao, Collectors.counting()))  // Conta as ocorrências de cada função
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())  // Encontra a função mais comum
+                .map(Map.Entry::getKey)
+                .orElseThrow(() -> new NotFoundException("Nenhuma função comum encontrada no período especificado."));
     }
 
     /**
      * Vai retornar o nome da Franquia mais comum nos times dentro do período
      */
     public String franquiaMaisFamosa(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes) {
-        // TODO Implementar método seguindo as instruções!
-        return null;
+        List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+
+        return timesFiltrados.stream()
+                .collect(Collectors.groupingBy(
+                        time -> time.getComposicaoTime().stream()
+                                .map(composicao -> composicao.getIntegrante().getFranquia())
+                                .findFirst()
+                                .orElseThrow(() -> new NotFoundException("Nenhuma franquia encontrada para esse time.")),
+                        Collectors.counting()
+                ))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElseThrow(() -> new NotFoundException("Nenhuma franquia mais famosa encontrada no período especificado."));
     }
 
 
@@ -135,16 +178,40 @@ public class ApiService {
      * Vai retornar o nome da Franquia mais comum nos times dentro do período
      */
     public Map<String, Long> contagemPorFranquia(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes){
-        // TODO Implementar método seguindo as instruções!
-        return null;
+        List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+
+        Map<String, Long> contagemPorFranquia = timesFiltrados.stream()
+                .flatMap(time -> time.getComposicaoTime().stream())
+                .collect(Collectors.groupingBy(
+                        composicao -> composicao.getIntegrante().getFranquia(),
+                        Collectors.counting()
+                ));
+
+        if (contagemPorFranquia.isEmpty()) {
+            throw new NotFoundException("Nenhuma franquia encontrada no período especificado.");
+        }
+
+        return contagemPorFranquia;
     }
 
     /**
      * Vai retornar o número (quantidade) de Funções dentro do período
      */
-    public Map<String, Long> contagemPorFuncao(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes){
-        // TODO Implementar método seguindo as instruções!
-        return null;
+    public Map<String, Long> contagemPorFuncao(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes) {
+        List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+
+        Map<String, Long> contagemPorFuncao = timesFiltrados.stream()
+                .flatMap(time -> time.getComposicaoTime().stream())
+                .collect(Collectors.groupingBy(
+                        composicao -> composicao.getIntegrante().getFuncao(),
+                        Collectors.counting()
+                ));
+
+        if (contagemPorFuncao.isEmpty()) {
+            throw new NotFoundException("Nenhuma função encontrada no período especificado.");
+        }
+
+        return contagemPorFuncao;
     }
 
 }
