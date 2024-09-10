@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class ApiService {
 
     public void validaData(LocalDate data) {
-        if (data.equals("") || data.equals(null)) {
+        if (data == null) {
             throw new DateNotFoundException("A data do time não pode ser nula.");
         }
 
@@ -33,7 +33,7 @@ public class ApiService {
     }
 
     public void validaTimesFiltrados(List<Time> timesFiltrados) {
-        if (timesFiltrados.equals(null) || timesFiltrados.isEmpty()) {
+        if (timesFiltrados == null || timesFiltrados.isEmpty()) {
             throw new NotFoundException("Nenhum time encontrado no período especificado.");
         }
     }
