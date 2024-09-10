@@ -2,6 +2,8 @@ package br.com.duxusdesafio.controller;
 
 import br.com.duxusdesafio.dto.IntegranteDto;
 import br.com.duxusdesafio.exceptions.IntegranteException;
+import br.com.duxusdesafio.exceptions.NotFoundException;
+import br.com.duxusdesafio.exceptions.NullIntegranteException;
 import br.com.duxusdesafio.model.ComposicaoTime;
 import br.com.duxusdesafio.model.Integrante;
 import br.com.duxusdesafio.model.Time;
@@ -26,41 +28,63 @@ public class IntegranteController {
     private IntegranteService integranteService;
 
     @PostMapping(value = "cadastrar")
-    public ResponseEntity<Integrante> cadastrarIntegrante(@Valid @RequestBody IntegranteDto integranteDto) {
-        Integrante integrante = integranteService.cadastrarIntegrante(integranteDto);
-        return new ResponseEntity<>(integrante, HttpStatus.CREATED);
+    public ResponseEntity<Object> cadastrarIntegrante(@Valid @RequestBody IntegranteDto integranteDto) {
+        try {
+            Integrante integrante = integranteService.cadastrarIntegrante(integranteDto);
+            return new ResponseEntity<>(integrante, HttpStatus.CREATED);
+        } catch (IntegranteException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping(value = "listar")
-    public ResponseEntity<List<Integrante>> listarIntegrantes() {
-        List<Integrante> integrantes = integranteService.listarIntegrantes();
-        return new ResponseEntity<>(integrantes, HttpStatus.OK);
+    public ResponseEntity<Object> listarIntegrantes() {
+        try {
+            List<Integrante> integrantes = integranteService.listarIntegrantes();
+            return new ResponseEntity<>(integrantes, HttpStatus.OK);
+        } catch (NullIntegranteException | IntegranteException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Integrante> buscarIntegrantePorId(@PathVariable Long id) {
-        Optional<Integrante> integranteOpt = integranteService.buscarIntegrantePorId(id);
-        return integranteOpt.map(integrante -> new ResponseEntity<>(integrante, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Object> buscarIntegrantePorId(@PathVariable Long id) {
+        try {
+            Integrante integrante = integranteService.buscarIntegrantePorId(id)
+                    .orElseThrow(() -> new NullIntegranteException("Integrante não encontrado para o ID: " + id));
+            return new ResponseEntity<>(integrante, HttpStatus.OK);
+        } catch (NullIntegranteException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PutMapping("atualizar/{id}")
-    public ResponseEntity<Integrante> atualizarIntegrante(@PathVariable Long id, @RequestBody IntegranteDto integranteDto) {
+    public ResponseEntity<Object> atualizarIntegrante(@PathVariable Long id, @RequestBody IntegranteDto integranteDto) {
         try {
             Integrante integrante = integranteService.atualizarIntegrante(id, integranteDto);
             return new ResponseEntity<>(integrante, HttpStatus.OK);
-        } catch (IntegranteException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @DeleteMapping("excluir/{id}")
-    public ResponseEntity<Void> deletarIntegrante(@PathVariable Long id) {
+    public ResponseEntity<Object> deletarIntegrante(@PathVariable Long id) {
         try {
             integranteService.deletarIntegrante(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IntegranteException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

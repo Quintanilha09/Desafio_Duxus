@@ -3,6 +3,7 @@ package br.com.duxusdesafio.service;
 import br.com.duxusdesafio.dto.IntegranteDto;
 import br.com.duxusdesafio.exceptions.IntegranteException;
 import br.com.duxusdesafio.exceptions.NotFoundException;
+import br.com.duxusdesafio.exceptions.NullIntegranteException;
 import br.com.duxusdesafio.model.ComposicaoTime;
 import br.com.duxusdesafio.model.Integrante;
 import br.com.duxusdesafio.model.Time;
@@ -24,13 +25,13 @@ public class IntegranteService {
     @Autowired
     private TimeRepository timeRepository;
 
-    public Integrante cadastrarIntegrante(IntegranteDto integranteDto) {
-
-        Optional<Integrante> existente = integranteRepository.findByNome(integranteDto.getNome());
-        if (existente.isPresent()) {
-            throw new IntegranteException("Integrante com o mesmo nome já existe");
+    public void validaIntegrantes(List<Integrante> integrantes) {
+        if (integrantes.isEmpty() || integrantes.equals(null)) {
+            throw new NullIntegranteException("A lista de integrantes é nula");
         }
+    }
 
+    public Integrante cadastrarIntegrante(IntegranteDto integranteDto) throws IntegranteException{
         Integrante integrante = new Integrante();
         integrante.setFranquia(integranteDto.getFranquia());
         integrante.setNome(integranteDto.getNome());
@@ -40,20 +41,22 @@ public class IntegranteService {
     }
 
     public List<Integrante> listarIntegrantes() {
+        List<Integrante> integrantes = integranteRepository.findAll();
+        validaIntegrantes(integrantes);
         return integranteRepository.findAll();
     }
 
     public Optional<Integrante> buscarIntegrantePorId(Long id) {
+        if (id.equals(null) || id.equals("")) {
+            throw new NullIntegranteException("O id do integrante é nulo");
+        }
         return integranteRepository.findById(id);
     }
 
     public Integrante atualizarIntegrante(Long id, IntegranteDto integranteDto) {
-        Optional<Integrante> integranteOpt = integranteRepository.findById(id);
-        if (!integranteOpt.isPresent()) {
-            throw new NotFoundException("Integrante não encontrado");
-        }
+        Integrante integrante = integranteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Integrante não encontrado"));
 
-        Integrante integrante = integranteOpt.get();
         integrante.setFranquia(integranteDto.getFranquia());
         integrante.setNome(integranteDto.getNome());
         integrante.setFuncao(integranteDto.getFuncao());
@@ -63,7 +66,7 @@ public class IntegranteService {
 
     public String deletarIntegrante(Long id) {
         if (!integranteRepository.existsById(id)) {
-            throw new IntegranteException("Integrante não encontrado");
+            throw new NotFoundException("Integrante não encontrado");
         }
         integranteRepository.deleteById(id);
         return "Integrante deletado com sucesso!";

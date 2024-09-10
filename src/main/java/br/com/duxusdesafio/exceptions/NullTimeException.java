@@ -2,7 +2,7 @@ package br.com.duxusdesafio.exceptions;
 
 public class NullTimeException extends RuntimeException {
     public NullTimeException() {
-        super("A lista de times é nula");
+        super("O Time ou lista de Time é nula");
     }
 
     public NullTimeException(String message) {

@@ -1,6 +1,6 @@
 package br.com.duxusdesafio.service;
 
-import br.com.duxusdesafio.exceptions.DataNotFoundException;
+import br.com.duxusdesafio.exceptions.DateNotFoundException;
 import br.com.duxusdesafio.exceptions.NotFoundException;
 import br.com.duxusdesafio.exceptions.NullTimeException;
 import br.com.duxusdesafio.model.ComposicaoTime;
@@ -22,17 +22,42 @@ import java.util.stream.Collectors;
 @Service
 public class ApiService {
 
+    public void validaData(LocalDate data) {
+        if (data.equals("") || data.equals(null)) {
+            throw new DateNotFoundException("A data do time não pode ser nula.");
+        }
+
+        if (data.isBefore(LocalDate.now())) {
+            throw new DateNotFoundException("A data do time não pode ser anterior à data de hoje.");
+        }
+    }
+
+    public void validaTimesFiltrados(List<Time> timesFiltrados) {
+        if (timesFiltrados.equals(null) || timesFiltrados.isEmpty()) {
+            throw new NotFoundException("Nenhum time encontrado no período especificado.");
+        }
+    }
+
+    public void validaTodosOsTimes(List<Time> times) {
+        if (times == null || times.isEmpty()) {
+            throw new NullTimeException("A lista de todos os times não pode ser nula ou vazia.");
+        }
+    }
+
     /**
      * Vai retornar uma lista com os nomes dos integrantes do time daquela data
      */
     public List<String> timeDaData(LocalDate data, List<Time> todosOsTimes){
+        validaData(data);
+        validaTodosOsTimes(todosOsTimes);
+
         return todosOsTimes.stream()
                 .filter(time -> time.getData().equals(data))
                 .findFirst()
                 .map(time -> time.getComposicaoTime().stream()
                         .map(composicao -> composicao.getIntegrante().getNome())
                         .collect(Collectors.toList()))
-                .orElseThrow(() -> new DataNotFoundException("Data " + data + " não encontrada."));
+                .orElseThrow(() -> new DateNotFoundException("Data " + data + " não encontrada."));
     }
 
     /**
@@ -56,9 +81,8 @@ public class ApiService {
      * Seguindo o primeiro princípio do SOLID, Single Responsability Principle
      */
     private List<Time> filtrarTimesPorPeriodo(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes) {
-        if (todosOsTimes == null || todosOsTimes.isEmpty()) {
-            throw new NullTimeException("A lista de todos os times não pode ser nula ou vazia.");
-        }
+        validaData(dataInicial);
+        validaTodosOsTimes(todosOsTimes);
 
         List<Time> timesFiltrados = todosOsTimes.stream()
                 .filter(time -> {
@@ -80,9 +104,7 @@ public class ApiService {
      * Seguindo o primeiro princípio do SOLID, Single Responsability Principle
      */
     private Map<Integrante, Long> contarAparicoes(List<Time> timesFiltrados) {
-        if (timesFiltrados == null || timesFiltrados.isEmpty()) {
-            throw new NullTimeException("A lista de times filtrados não pode ser nula ou vazia.");
-        }
+        validaTimesFiltrados(timesFiltrados);
 
         Map<Integrante, Long> contadorDeAparicoes = timesFiltrados.stream()
                 .flatMap(time -> time.getComposicaoTime().stream())
@@ -120,6 +142,8 @@ public class ApiService {
      */
     public List<String> timeMaisComum(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes){
         List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+        validaTimesFiltrados(timesFiltrados);
+        validaData(dataInicial);
 
         if (timesFiltrados.isEmpty()) {
             throw new NotFoundException("Nenhum time encontrado no período especificado.");
@@ -142,6 +166,8 @@ public class ApiService {
      */
     public String funcaoMaisComum(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes){
         List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+        validaTimesFiltrados(timesFiltrados);
+        validaData(dataInicial);
 
         return timesFiltrados.stream()
                 .flatMap(time -> time.getComposicaoTime().stream())  // Obtém a composição de cada time
@@ -158,6 +184,8 @@ public class ApiService {
      */
     public String franquiaMaisFamosa(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes) {
         List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+        validaTimesFiltrados(timesFiltrados);
+        validaData(dataInicial);
 
         return timesFiltrados.stream()
                 .collect(Collectors.groupingBy(
@@ -179,6 +207,8 @@ public class ApiService {
      */
     public Map<String, Long> contagemPorFranquia(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes){
         List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+        validaTimesFiltrados(timesFiltrados);
+        validaData(dataInicial);
 
         Map<String, Long> contagemPorFranquia = timesFiltrados.stream()
                 .flatMap(time -> time.getComposicaoTime().stream())
@@ -199,6 +229,8 @@ public class ApiService {
      */
     public Map<String, Long> contagemPorFuncao(LocalDate dataInicial, LocalDate dataFinal, List<Time> todosOsTimes) {
         List<Time> timesFiltrados = filtrarTimesPorPeriodo(dataInicial, dataFinal, todosOsTimes);
+        validaData(dataInicial);
+        validaTimesFiltrados(timesFiltrados);
 
         Map<String, Long> contagemPorFuncao = timesFiltrados.stream()
                 .flatMap(time -> time.getComposicaoTime().stream())
