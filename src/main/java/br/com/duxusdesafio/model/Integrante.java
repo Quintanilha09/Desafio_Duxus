@@ -1,7 +1,10 @@
 package br.com.duxusdesafio.model;
 
+import br.com.duxusdesafio.dto.IntegranteDto;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -101,5 +104,17 @@ public class Integrante {
 				", nome='" + nome + '\'' +
 				", funcao='" + funcao + '\'' +
 				'}';
+	}
+
+	public Integrante converterDtoParaIntegrante(IntegranteDto integranteDto, Time time) {
+		Integrante integrante = new Integrante();
+		integrante.setFranquia(integranteDto.getFranquia());
+		integrante.setNome(integranteDto.getNome());
+		integrante.setFuncao(integranteDto.getFuncao());
+
+		ComposicaoTime composicaoTime = new ComposicaoTime(time, integrante);
+		integrante.setComposicaoTime(Arrays.asList(composicaoTime));
+
+		return integrante;
 	}
 }

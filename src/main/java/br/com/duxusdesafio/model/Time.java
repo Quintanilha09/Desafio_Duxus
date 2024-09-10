@@ -1,5 +1,7 @@
 package br.com.duxusdesafio.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +19,7 @@ public class Time {
     private LocalDate data;
 	
 	@OneToMany(mappedBy = "time", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<ComposicaoTime> composicaoTime;
 
 	public Time() {
