@@ -3,14 +3,14 @@
 ## Detalhes para rodar a aplicação
 #### Banco de Dados:
 Postgres
-
-#### Banco de Dados: Postgres
 Faça o download do pgAdmin 4
+
 ![image](https://github.com/user-attachments/assets/d21ad237-49ca-49a8-bb49-6c4562d96036)
 
 #### Esta aplicação tem Front-End
 O Front-End está em outro repositório:
 https://github.com/Quintanilha09/Front-End-Desafio-Duxus.git
+Não esqueça de testar a API pelo front.
 
 #### Contexto da aplicação
 http://localhost:8080
@@ -40,7 +40,7 @@ http://localhost:8080/contagem-por-franquia?dataInicial=yyyy-mm-dd&dataFinal=yyy
 http://localhost:8080/contagem-por-funcao?dataInicial=yyyy-mm-dd&dataFinal=yyyy-mm-dd
 
 #### Foi utilizado o Postman para realizar as consultas pelos endpoints.
-
+Não deixe de testar a API pelo Postman
 
 
 
