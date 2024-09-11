@@ -1,11 +1,9 @@
 package br.com.duxusdesafio.model;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
 import java.util.Objects;
-
 
 @Entity
 @Table(name = "composicao_time")

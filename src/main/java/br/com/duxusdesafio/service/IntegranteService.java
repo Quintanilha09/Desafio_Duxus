@@ -4,15 +4,12 @@ import br.com.duxusdesafio.dto.IntegranteDto;
 import br.com.duxusdesafio.exceptions.IntegranteException;
 import br.com.duxusdesafio.exceptions.NotFoundException;
 import br.com.duxusdesafio.exceptions.NullIntegranteException;
-import br.com.duxusdesafio.model.ComposicaoTime;
 import br.com.duxusdesafio.model.Integrante;
-import br.com.duxusdesafio.model.Time;
 import br.com.duxusdesafio.repository.IntegranteRepository;
 import br.com.duxusdesafio.repository.TimeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +23,7 @@ public class IntegranteService {
     private TimeRepository timeRepository;
 
     public void validaIntegrantes(List<Integrante> integrantes) {
-        if (integrantes.isEmpty() || integrantes.equals(null)) {
+        if (integrantes == null || integrantes.isEmpty()) {
             throw new NullIntegranteException("A lista de integrantes é nula");
         }
     }
@@ -47,7 +44,7 @@ public class IntegranteService {
     }
 
     public Optional<Integrante> buscarIntegrantePorId(Long id) {
-        if (id.equals(null) || id.equals("")) {
+        if (id == null) {
             throw new NullIntegranteException("O id do integrante é nulo");
         }
         return integranteRepository.findById(id);

@@ -35,7 +35,6 @@ public class ApiController {
         try {
             List<Time> todosOsTimes = timeService.listarTodosOsTimes();
             List<String> nomesIntegrantes = apiService.timeDaData(data, todosOsTimes);
-
             TimeDaDataResponse response = new TimeDaDataResponse(data, nomesIntegrantes);
 
             return ResponseEntity.ok(response);

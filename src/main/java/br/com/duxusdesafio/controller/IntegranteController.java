@@ -4,11 +4,7 @@ import br.com.duxusdesafio.dto.IntegranteDto;
 import br.com.duxusdesafio.exceptions.IntegranteException;
 import br.com.duxusdesafio.exceptions.NotFoundException;
 import br.com.duxusdesafio.exceptions.NullIntegranteException;
-import br.com.duxusdesafio.model.ComposicaoTime;
 import br.com.duxusdesafio.model.Integrante;
-import br.com.duxusdesafio.model.Time;
-import br.com.duxusdesafio.repository.IntegranteRepository;
-import br.com.duxusdesafio.repository.TimeRepository;
 import br.com.duxusdesafio.service.IntegranteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("integrante")

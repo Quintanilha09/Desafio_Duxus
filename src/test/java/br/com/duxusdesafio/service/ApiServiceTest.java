@@ -12,9 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -97,11 +95,9 @@ public class ApiServiceTest {
 
     @Test
     public void deveLancarNotFoundExceptionQuandoNenhumTimeForEncontrado() {
-        // Configurar dados do teste
         LocalDate dataInicial = LocalDate.of(2026, 1, 1);
         LocalDate dataFinal = LocalDate.of(2027, 1, 1);
 
-        // Lista de times que está fora do período especificado
         List<Time> todosOsTimes = mock(List.class);
 
         // Verificar se a exceção é lançada ao tentar filtrar times
@@ -148,23 +144,17 @@ public class ApiServiceTest {
         ComposicaoTime composicao1 = new ComposicaoTime(null, integrante1);
         ComposicaoTime composicao2 = new ComposicaoTime(null, integrante2);
 
-        // Adicionando a composição ao time
         Time time = new Time(data, Arrays.asList(composicao1, composicao2));
 
-        // Vinculando a composição ao time
         composicao1.setTime(time);
         composicao2.setTime(time);
 
-        // Lista de todos os times
         List<Time> todosOsTimes = Arrays.asList(time);
 
-        // Executa o método a ser testado
         List<String> resultado = apiService.timeDaData(data, todosOsTimes);
 
-        // Lista de nomes esperados
         List<String> esperado = Arrays.asList("João", "Antonio");
 
-        // Valida o resultado
         Assertions.assertEquals(esperado, resultado);
     }
 
@@ -182,11 +172,9 @@ public class ApiServiceTest {
 
     @Test
     public void deveRetornarIntegranteMaisUsadoNoPeriodo() {
-        // Definir período de filtragem
         LocalDate dataInicial = LocalDate.now().plusDays(1); // Amanhã
         LocalDate dataFinal = LocalDate.now().plusMonths(1); // Um mês à frente
 
-        // Criar integrantes
         Integrante integrante1 = new Integrante("Franquia A", "João", "Atacante", Collections.emptyList());
         Integrante integrante2 = new Integrante("Franquia B", "Maria", "Defensor", Collections.emptyList());
 
@@ -204,14 +192,12 @@ public class ApiServiceTest {
         composicao2.setTime(time1);
         composicao3.setTime(time2);
 
-        // Lista de todos os times
         List<Time> todosOsTimes = Arrays.asList(time1, time2);
 
         // Configurar o mock para retornar o integrante mais usado
         ApiService mockApiService = mock(ApiService.class);
         when(mockApiService.integranteMaisUsado(dataInicial, dataFinal, todosOsTimes)).thenReturn(integrante1);
 
-        // Executa o método a ser testado usando o mock
         Integrante resultado = mockApiService.integranteMaisUsado(dataInicial, dataFinal, todosOsTimes);
 
         // Validar o resultado esperado
@@ -230,11 +216,11 @@ public class ApiServiceTest {
         // Criando a composição do time
         ComposicaoTime composicao1 = new ComposicaoTime(null, integrante1);
         ComposicaoTime composicao2 = new ComposicaoTime(null, integrante2);
-        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante1); // João aparece mais vezes
+        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante1);
 
         // Adicionando a composição ao time
         Time time1 = new Time(dataInicial, Arrays.asList(composicao1, composicao2));
-        Time time2 = new Time(dataFinal, Arrays.asList(composicao3)); // João aparece no segundo time
+        Time time2 = new Time(dataFinal, Arrays.asList(composicao3));
 
         // Lista de todos os times
         List<Time> todosOsTimes = Arrays.asList(time1, time2);
@@ -250,7 +236,7 @@ public class ApiServiceTest {
     }
 
     @Test
-    public void testTimeMaisComum_ComDados() {
+    public void testTimeMaisComum() {
 
         TimeRepository timeRepository = mock(TimeRepository.class);
 
@@ -264,11 +250,11 @@ public class ApiServiceTest {
         // Criando as composições de time
         ComposicaoTime composicao1 = new ComposicaoTime(null, integrante1);
         ComposicaoTime composicao2 = new ComposicaoTime(null, integrante2);
-        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante1); // João aparece mais vezes
+        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante1);
 
         // Criando os times
         Time time1 = new Time(dataInicial, Arrays.asList(composicao1, composicao2));
-        Time time2 = new Time(dataFinal, Arrays.asList(composicao3)); // João aparece no segundo time
+        Time time2 = new Time(dataFinal, Arrays.asList(composicao3));
 
         // Lista de todos os times
         List<Time> todosOsTimes = Arrays.asList(time1, time2);
@@ -281,10 +267,132 @@ public class ApiServiceTest {
 
         // Verificação
         Assertions.assertNotNull(resultado);
-        Assertions.assertTrue(resultado.contains("João")); // João deve ser o integrante mais comum
+        Assertions.assertTrue(resultado.contains("João"));
     }
 
+    @Test
+    public void deveRetornarAFuncaoMaisComum() {
 
+        TimeRepository timeRepository = mock(TimeRepository.class);
+
+        LocalDate dataInicial = LocalDate.of(2024, 11, 1);
+        LocalDate dataFinal = LocalDate.of(2024, 12, 31);
+
+        // Criando os integrantes
+        Integrante integrante1 = new Integrante("Franquia A", "João", "Atacante", Collections.emptyList());
+        Integrante integrante2 = new Integrante("Franquia B", "Antonio", "Defensor", Collections.emptyList());
+        Integrante integrante3 = new Integrante("Franquia C", "Jonas", "Defensor", Collections.emptyList());
+
+        // Criando as composições de time
+        ComposicaoTime composicao1 = new ComposicaoTime(null, integrante1);
+        ComposicaoTime composicao2 = new ComposicaoTime(null, integrante2);
+        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante3);
+
+        // Criando os times
+        Time time1 = new Time(dataInicial, Arrays.asList(composicao1, composicao2));
+        Time time2 = new Time(dataFinal, Arrays.asList(composicao3));
+
+        // Lista de todos os times
+        List<Time> todosOsTimes = Arrays.asList(time1, time2);
+
+        String funcaoMaisComum = apiService.funcaoMaisComum(dataInicial, dataFinal, todosOsTimes);
+
+        Assertions.assertEquals("Defensor", funcaoMaisComum);
+    }
+
+    @Test
+    public void testFranquiaMaisFamosa_ComFranquiasValidas() {
+
+        TimeRepository timeRepository = mock(TimeRepository.class);
+
+        LocalDate dataInicial = LocalDate.of(2024, 11, 1);
+        LocalDate dataFinal = LocalDate.of(2024, 12, 31);
+
+        // Criando os integrantes
+        Integrante integrante1 = new Integrante("Franquia A", "João", "Atacante", Collections.emptyList());
+        Integrante integrante2 = new Integrante("Franquia B", "Antonio", "Defensor", Collections.emptyList());
+        Integrante integrante3 = new Integrante("Franquia A", "Jonas", "Defensor", Collections.emptyList());
+
+        // Criando as composições de time
+        ComposicaoTime composicao1 = new ComposicaoTime(null, integrante1);
+        ComposicaoTime composicao2 = new ComposicaoTime(null, integrante2);
+        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante3);
+
+        // Criando os times
+        Time time1 = new Time(dataInicial, Arrays.asList(composicao1, composicao2));
+        Time time2 = new Time(dataFinal, Arrays.asList(composicao3));
+
+        // Lista de todos os times
+        List<Time> todosOsTimes = Arrays.asList(time1, time2);
+
+        String franquiaMaisFamosa = apiService.franquiaMaisFamosa(dataInicial, dataFinal, todosOsTimes);
+
+        Assertions.assertEquals("Franquia A", franquiaMaisFamosa);
+    }
+
+    @Test
+    public void testContagemPorFranquia_ComFranquiasValidas() {
+
+        TimeRepository timeRepository = mock(TimeRepository.class);
+
+        LocalDate dataInicial = LocalDate.of(2024, 11, 1);
+        LocalDate dataFinal = LocalDate.of(2025, 02, 20);
+
+        // Criando os integrantes
+        Integrante integrante1 = new Integrante("Franquia A", "João", "Atacante", Collections.emptyList());
+        Integrante integrante2 = new Integrante("Franquia B", "Antonio", "Defensor", Collections.emptyList());
+        Integrante integrante3 = new Integrante("Franquia A", "Jonas", "Defensor", Collections.emptyList());
+
+        // Criando as composições de time
+        ComposicaoTime composicao1 = new ComposicaoTime(null, integrante1);
+        ComposicaoTime composicao2 = new ComposicaoTime(null, integrante2);
+        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante3);
+
+        // Criando os times
+        Time time1 = new Time(dataInicial, Arrays.asList(composicao1, composicao2));
+        Time time2 = new Time(dataFinal, Arrays.asList(composicao3));
+
+        // Lista de todos os times
+        List<Time> todosOsTimes = Arrays.asList(time1, time2);
+
+        Map<String, Long> contagem = apiService.contagemPorFranquia(dataInicial, dataFinal, todosOsTimes);
+
+        Assertions.assertEquals(2, contagem.size());
+        Assertions.assertEquals(2L, contagem.get("Franquia A"));
+        Assertions.assertEquals(1L, contagem.get("Franquia B"));
+    }
+
+    @Test
+    public void testContagemPorFuncao_ComFuncoesValidas() {
+
+        TimeRepository timeRepository = mock(TimeRepository.class);
+
+        LocalDate dataInicial = LocalDate.of(2024, 11, 1);
+        LocalDate dataFinal = LocalDate.of(2025, 02, 20);
+
+        // Criando os integrantes
+        Integrante integrante1 = new Integrante("Franquia A", "João", "Atacante", Collections.emptyList());
+        Integrante integrante2 = new Integrante("Franquia B", "Antonio", "Defensor", Collections.emptyList());
+        Integrante integrante3 = new Integrante("Franquia A", "Jonas", "Atacante", Collections.emptyList());
+
+        // Criando as composições de time
+        ComposicaoTime composicao1 = new ComposicaoTime(null, integrante1);
+        ComposicaoTime composicao2 = new ComposicaoTime(null, integrante2);
+        ComposicaoTime composicao3 = new ComposicaoTime(null, integrante3);
+
+        // Criando os times
+        Time time1 = new Time(dataInicial, Arrays.asList(composicao1, composicao2));
+        Time time2 = new Time(dataFinal, Arrays.asList(composicao3));
+
+        // Lista de todos os times
+        List<Time> todosOsTimes = Arrays.asList(time1, time2);
+
+        Map<String, Long> contagem = apiService.contagemPorFuncao(dataInicial, dataFinal, todosOsTimes);
+
+        Assertions.assertEquals(2, contagem.size());
+        Assertions.assertEquals(2L, contagem.get("Atacante"));
+        Assertions.assertEquals(1L, contagem.get("Defensor"));
+    }
 
 }
 

@@ -23,12 +23,8 @@ import java.util.stream.Collectors;
 public class ApiService {
 
     public void validaData(LocalDate data) {
-        if (data == null) {
-            throw new DateNotFoundException("A data do time não pode ser nula.");
-        }
-
-        if (data.isBefore(LocalDate.now())) {
-            throw new DateNotFoundException("A data do time não pode ser anterior à data de hoje.");
+        if (data == null || data.isBefore(LocalDate.now())) {
+            throw new DateNotFoundException("A data do time não pode ser nula ou anterior à data atual.");
         }
     }
 
