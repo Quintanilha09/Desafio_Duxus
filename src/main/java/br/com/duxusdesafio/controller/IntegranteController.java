@@ -21,7 +21,7 @@ public class IntegranteController {
     @Autowired
     private IntegranteService integranteService;
 
-    @PostMapping(value = "cadastrar")
+    @PostMapping(value = "/cadastrar")
     public ResponseEntity<Object> cadastrarIntegrante(@Valid @RequestBody IntegranteDto integranteDto) {
         try {
             Integrante integrante = integranteService.cadastrarIntegrante(integranteDto);
@@ -33,7 +33,7 @@ public class IntegranteController {
         }
     }
 
-    @GetMapping(value = "listar")
+    @GetMapping(value = "/listar")
     public ResponseEntity<Object> listarIntegrantes() {
         try {
             List<Integrante> integrantes = integranteService.listarIntegrantes();
@@ -58,7 +58,7 @@ public class IntegranteController {
         }
     }
 
-    @PutMapping("atualizar/{id}")
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<Object> atualizarIntegrante(@PathVariable Long id, @RequestBody IntegranteDto integranteDto) {
         try {
             Integrante integrante = integranteService.atualizarIntegrante(id, integranteDto);
@@ -70,7 +70,7 @@ public class IntegranteController {
         }
     }
 
-    @DeleteMapping("excluir/{id}")
+    @DeleteMapping("/excluir/{id}")
     public ResponseEntity<Object> deletarIntegrante(@PathVariable Long id) {
         try {
             integranteService.deletarIntegrante(id);

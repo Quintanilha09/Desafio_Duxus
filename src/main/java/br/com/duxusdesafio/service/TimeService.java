@@ -25,14 +25,16 @@ public class TimeService {
     @Autowired
     private TimeRepository timeRepository;
 
-    public Time cadastrarTime(LocalDate data, List<Long> idsIntegrantes) {
-        if (data == null) {
-            throw new DateNotFoundException("A data do time não pode ser nula.");
-        }
+    private static final LocalDate DATA_DE_HOJE = LocalDate.now();
 
-        if (data.isBefore(LocalDate.now())) {
-            throw new DateNotFoundException("A data do time não pode ser anterior à data de hoje.");
+    public void validaData(LocalDate data) {
+        if (data == null || data.isBefore(DATA_DE_HOJE)) {
+            throw new DateNotFoundException("A data do time não pode ser nula ou anterior a data de hoje.");
         }
+    }
+
+    public Time cadastrarTime(LocalDate data, List<Long> idsIntegrantes) {
+        validaData(data);
 
         if (idsIntegrantes == null || idsIntegrantes.isEmpty()) {
             throw new IntegranteException("A lista de IDs de integrantes não pode ser nula ou vazia.");

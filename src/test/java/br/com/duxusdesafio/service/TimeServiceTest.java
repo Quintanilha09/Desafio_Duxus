@@ -47,7 +47,7 @@ public class TimeServiceTest {
         DateNotFoundException exception = Assertions.assertThrows(DateNotFoundException.class, () ->
                 timeService.cadastrarTime(data, idsIntegrantes));
 
-        Assertions.assertEquals("A data do time não pode ser nula.", exception.getMessage());
+        Assertions.assertEquals("A data do time não pode ser nula ou anterior a data de hoje.", exception.getMessage());
         Mockito.verify(timeRepository, Mockito.never()).save(Mockito.any(Time.class));
     }
 
@@ -59,7 +59,7 @@ public class TimeServiceTest {
         DateNotFoundException exception = Assertions.assertThrows(DateNotFoundException.class, () ->
                 timeService.cadastrarTime(data, idsIntegrantes));
 
-        Assertions.assertEquals("A data do time não pode ser anterior à data de hoje.", exception.getMessage());
+        Assertions.assertEquals("A data do time não pode ser nula ou anterior a data de hoje.", exception.getMessage());
         Mockito.verify(timeRepository, Mockito.never()).save(Mockito.any(Time.class));
     }
 

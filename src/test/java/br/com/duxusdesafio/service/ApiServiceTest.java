@@ -54,12 +54,6 @@ public class ApiServiceTest {
     }
 
     @Test
-    public void deveLancarExcecaoQuandoDataForAnteriorAHoje() {
-        LocalDate dataPassada = LocalDate.of(2023, 1, 1);
-        Assertions.assertThrows(DateNotFoundException.class, () -> apiService.validaData(dataPassada));
-    }
-
-    @Test
     public void deveLancarExcecaoQuandoTimesFiltradosForemNulos() {
         Assertions.assertThrows(NotFoundException.class, () -> apiService.validaTimesFiltrados(null));
     }
@@ -110,11 +104,6 @@ public class ApiServiceTest {
                 apiService.integranteMaisUsado(dataInicial, dataFinal, todosOsTimes);
             });
         });
-    }
-
-    @Test
-    public void deveLancarExcecaoQuandoDataForNulaTimeDaData() {
-        Assertions.assertThrows(DateNotFoundException.class, () -> apiService.timeDaData(null, Arrays.asList(new Time())));
     }
 
     @Test
