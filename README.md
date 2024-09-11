@@ -1,7 +1,7 @@
 # Aplicação para cadastro de integrantes e time Élin Duxus
 
 ## Detalhes para rodar a aplicação
-#### Banco de Dados:
+## Banco de Dados:
 Postgres
 Faça o download do pgAdmin 4
 
