@@ -14,8 +14,7 @@
 
 ## Contexto da aplicação
 #### http://localhost:8080
-#### Verifique se a porta 8080 já está sendo usada por outro serviço, caso esteja, mate a execução desse serviço
-#### A aplicação está configurada para rodar na porta 8080
+#### A aplicação está configurada para rodar na porta 8080. Verifique se a porta 8080 já está sendo usada por outro serviço, caso esteja, mate a execução desse serviço
 
 ## Endpoints Integrante
 #### http://localhost:8080/integrante/cadastrar
