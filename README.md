@@ -2,8 +2,8 @@
 
 ## Detalhes para rodar a aplicação
 #### Banco de Dados:
-Postgres
-Faça o download do pgAdmin 4
+##### Postgres
+##### Faça o download do pgAdmin 4
 
 ![image](https://github.com/user-attachments/assets/d21ad237-49ca-49a8-bb49-6c4562d96036)
 
